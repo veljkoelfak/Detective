@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "961076077725",
+    "project_id": "detective-394017",
+    "storage_bucket": "detective-394017.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:961076077725:android:8937657c0820ed5e98a074",
+        "android_client_info": {
+          "package_name": "com.veljko.detective"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "961076077725-1f7e7884fotpd5l2nba3kjelhs544phc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.veljko.detective",
+            "certificate_hash": "f8e7861672e91b9f44a7deba31fba0ff796bf69f"
+          }
+        },
+        {
+          "client_id": "961076077725-4ui2ubj1cn8e4ohktlqsrkka3uvs9tus.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyABWiB02LAfgb2uWiOJsUOjRRFwGJH7_eM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "961076077725-4ui2ubj1cn8e4ohktlqsrkka3uvs9tus.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

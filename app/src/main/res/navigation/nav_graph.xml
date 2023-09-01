@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginScreen">
+    <activity
+        android:id="@+id/loginScreen"
+        android:name="com.veljko.detective.LoginScreen"
+        android:label="activity_login_screen"
+        tools:layout="@layout/activity_login_screen" />
+    <activity
+        android:id="@+id/registerScreen"
+        android:name="com.veljko.detective.RegisterScreen"
+        android:label="activity_register_screen"
+        tools:layout="@layout/activity_register_screen" />
+</navigation>
