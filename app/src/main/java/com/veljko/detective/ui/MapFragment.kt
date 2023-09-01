@@ -16,9 +16,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.*
@@ -51,11 +53,12 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private lateinit var locationCallback: LocationCallback
     private var isTrackingLocation = false
     private var isMapReady = false
-    private lateinit var viewModel: UserDataViewModel
     private lateinit var loc: Location
     private var currentLocationMarker: Marker? = null
     private var markersListData = listOf<FirebaseManager.Objects>()
     private var markerslistIDs = mutableListOf<String>()
+
+    private val viewModel: UserDataViewModel by activityViewModels()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +68,6 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             param2 = it.getString(ARG_PARAM2)
         }
 
-        viewModel = ViewModelProvider(this).get(UserDataViewModel::class.java)
 
 
     }

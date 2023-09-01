@@ -4,25 +4,22 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.ContentValues.TAG
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Color
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import java.io.File
 
 class CreateProfileActivity : AppCompatActivity() {
 
@@ -32,6 +29,8 @@ class CreateProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_profile)
+
+        val photoFile = File(createImageFile(this.getApplicationContext());)
 
         val username = intent.getStringExtra("username")
         viewModel = ViewModelProvider(this).get(RegLogViewModel::class.java)
@@ -105,6 +104,17 @@ class CreateProfileActivity : AppCompatActivity() {
             }
         }
 
+    private val getPictureCamera =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                if (photoFile != null) {
+                    uri = Uri.fromFile(photoFile)
+                    val imageView = findViewById<ImageView>(R.id.addPhoto)
+                    imageView.setImageURI((uri))
+                }
+            }
+        }
+
     fun onImageViewClicked(view: View) {
         val options = arrayOf("Take Photo", "Choose from Gallery", "Cancel")
 
@@ -115,7 +125,8 @@ class CreateProfileActivity : AppCompatActivity() {
             when (options[which]) {
                 "Take Photo" -> {
                     val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                    getPicture.launch(takePictureIntent)
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoFile)
+                    getPictureCamera.launch(takePictureIntent)
                 }
                 "Choose from Gallery" -> {
                     val pickPhotoIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)

@@ -65,7 +65,7 @@ class UserDataViewModel : ViewModel() {
                 for (doc in querySnapshot) {
                     val id = doc.id
                     val name = doc.getString("name")
-                    val desc = doc.getString("username")
+                    val desc = doc.getString("desc")
                     val loc = doc.getGeoPoint("location")
                     val toAdd = FirebaseManager.Objects(id, name, desc, loc)
                     tempList.add(toAdd)

@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,7 +28,7 @@ class LeaderboardFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
-    private lateinit var viewModel: UserDataViewModel
+    private val viewModel: UserDataViewModel by activityViewModels()
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: LeaderbordAdapter
 
@@ -38,7 +39,6 @@ class LeaderboardFragment : Fragment() {
             param2 = it.getString(ARG_PARAM2)
         }
 
-        viewModel = ViewModelProvider(this).get(UserDataViewModel::class.java)
 
     }
 
