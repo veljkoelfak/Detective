@@ -28,6 +28,9 @@ class RegLogViewModel : ViewModel() {
     val registerLiveData: LiveData<Boolean?>
         get() = _registerLiveData
 
+    private val _pointsLiveData = MutableLiveData<Boolean?>()
+    val pointsLiveData: LiveData<Boolean?>
+        get() = _pointsLiveData
 
 
     private val signedIn = MutableLiveData<Boolean>()
@@ -79,7 +82,16 @@ class RegLogViewModel : ViewModel() {
            }
        })
 
-
     }
+
+    fun addPoints(username: String, id: String) {
+        firebaseAuthenticationModel.addPoints(username, id, OnCompleteListener {task ->
+            if (task.isSuccessful) {
+                _pointsLiveData.value = true
+            }
+            else {
+                _pointsLiveData.value = false
+            }
+    })}
 
 }

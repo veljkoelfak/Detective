@@ -67,6 +67,7 @@ class LoginScreen : AppCompatActivity() {
                 val intent = Intent(this, MainActivity::class.java)
 
                 startActivity((intent))
+                finish()
             } else {
                 Toast.makeText(getApplicationContext(),"Error logging in",Toast.LENGTH_SHORT).show()
             }

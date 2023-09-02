@@ -20,6 +20,8 @@ import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -28,6 +30,7 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.veljko.detective.*
 import com.veljko.detective.R
@@ -83,6 +86,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val MapSupportFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
 
         if (MapSupportFragment != null) {
+
             MapSupportFragment.getMapAsync(this)
         }
 
@@ -96,7 +100,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             if (isLocationPermissionGranted()) {
                     var gp = GeoPoint(loc.latitude, loc.longitude)
 
-                    viewModel.addObject("Object", "Test",gp )
+                val fm : FragmentManager = childFragmentManager
+                val transaction = fm.beginTransaction()
+                transaction.replace(R.id.frag, AddObjectFragment())
+                transaction.addToBackStack("add")
+                transaction.commit()
                 }
         }
 
@@ -132,6 +140,9 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
 
 
+
+
+
         return view
     }
 
@@ -153,6 +164,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         })
 
+
     }
 
     private fun getMarkers() {
@@ -162,7 +174,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             if (d.id !in markerslistIDs) {
                 Log.d(TAG, d.loc!!.latitude.toString())
                 val latlng : LatLng = LatLng(d.loc!!.latitude, d.loc!!.longitude)
-                val markerOptions = MarkerOptions().position(latlng).title(d.name)
+                val markerOptions = MarkerOptions().position(latlng).title(d.type)
                 mMap.addMarker(markerOptions)
                 markerslistIDs.add(d.id!!)
             }

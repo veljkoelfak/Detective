@@ -42,7 +42,7 @@ class CluesAdapter :
 
             // Get element from your dataset at this position and replace the
             // contents of the view with that element
-            viewHolder.nameView.text = data?.get(position)?.name.toString()
+            viewHolder.nameView.text = data?.get(position)?.type.toString()
             viewHolder.descView.text = data?.get(position)?.desc.toString()
 
         }
