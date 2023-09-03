@@ -8,7 +8,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.veljko.detective.ui.CluesFragment
 import com.veljko.detective.ui.LeaderboardFragment
-import com.veljko.detective.ui.MapFragment
 import com.veljko.detective.ui.ProfileFragment
 
 

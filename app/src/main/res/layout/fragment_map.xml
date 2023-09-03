@@ -8,26 +8,85 @@
 
 
 
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/addButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:text="Add"
-        android:textColor="@android:color/white"
-        android:background="@drawable/rounded_corner"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="16dp"
-        android:textSize="16sp" />
+        <LinearLayout
+            android:id="@+id/lh"
+            android:layout_width="208dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_alignParentBottom="true"  >
 
+            <Button
+                android:id="@+id/addButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:text="Add"
+                android:layout_weight="1"
+                android:stateListAnimator="@null"
+                android:textColor="@android:color/white"
+                android:background="@drawable/rounded_corner"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/filterButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:text="Filter"
+                android:stateListAnimator="@null"
+                android:textColor="@android:color/white"
+                android:background="@drawable/rounded_corner"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/clearButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:text="Filter"
+                android:stateListAnimator="@null"
+                android:textColor="@android:color/white"
+                android:background="@drawable/rounded_corner"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+
+
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/object"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/addButton" />
 
 
 

@@ -1,11 +1,18 @@
-package com.veljko.detective.ui
+package com.veljko.detective
+
+import com.veljko.detective.ui.AddObjectFragment
+
+
 
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.ContentValues.TAG
-import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
@@ -14,26 +21,27 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.Toast
+import android.widget.CalendarView
+import android.widget.CheckBox
+import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.GeoPoint
 import com.veljko.detective.*
 import com.veljko.detective.R
+import java.util.*
+import kotlin.collections.HashMap
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -60,8 +68,21 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var currentLocationMarker: Marker? = null
     private var markersListData = listOf<FirebaseManager.Objects>()
     private var markerslistIDs = mutableListOf<String>()
+    private var markers = mutableListOf<Marker>()
+
+    private val markerMap = HashMap<Marker, FirebaseManager.Objects>()
 
     private val viewModel: UserDataViewModel by activityViewModels()
+
+
+
+    private var icon : BitmapDescriptor? = null
+
+    private var author: String? = null
+    private var types : MutableList<String> = ArrayList<String>()
+    private var diffs : MutableList<String> = ArrayList<String>()
+    private var date : Date? = Calendar.getInstance().time
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,6 +102,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View? {
 
+
+
         val view = inflater.inflate(R.layout.fragment_map, container, false)
 
         val MapSupportFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -89,6 +112,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
             MapSupportFragment.getMapAsync(this)
         }
+
+        val iconBitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_clue_icon)
+
+        val resizedBitmap = Bitmap.createScaledBitmap(iconBitmap, 100, 100, false)
+
+        icon = BitmapDescriptorFactory.fromBitmap(resizedBitmap)
+
+
 
 
 
@@ -102,7 +133,15 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
                 val fm : FragmentManager = childFragmentManager
                 val transaction = fm.beginTransaction()
-                transaction.replace(R.id.frag, AddObjectFragment())
+
+                val args = Bundle()
+                args.putDouble("lat", loc.latitude)
+                args.putDouble("lng", loc.longitude)
+
+                val addObjectFragment = AddObjectFragment()
+                addObjectFragment.arguments = args
+
+                transaction.replace(R.id.`object`, addObjectFragment)
                 transaction.addToBackStack("add")
                 transaction.commit()
                 }
@@ -139,8 +178,104 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         }
 
 
+        val filterButton = view.findViewById<Button>(R.id.filterButton)
+
+        filterButton.setOnClickListener{
+            var dialog : Dialog = Dialog(requireContext(), R.style.Theme_Detective)
+            dialog.setContentView(R.layout.filter_dialog)
+
+            var close : Button = dialog.findViewById(R.id.exitButton)
+
+            close.setOnClickListener{
+                dialog.dismiss()
+            }
+
+            var clear : Button = dialog.findViewById(R.id.clearButton)
+
+            clear.setOnClickListener{
+                dialog.dismiss()
+                clearFilters()
+            }
+
+            var apply: Button = dialog.findViewById(R.id.filterButton)
+
+            apply.setOnClickListener{
+
+                author = null
+                types = ArrayList<String>()
+                diffs = ArrayList<String>()
+                date = Calendar.getInstance().time
+
+                val authorText : EditText = dialog.findViewById<EditText>(R.id.authorEditText)
+                if (!authorText.text.isEmpty()) {
+                    author = authorText.text.toString()
+                }
+                val calendar : CalendarView = dialog.findViewById<CalendarView>(R.id.calendarView)
+
+                calendar.setOnDateChangeListener { calView: CalendarView, y, m, d ->
+
+                    Log.d(TAG, d.toString())
+                    val tmp : Calendar = Calendar.getInstance()
+                    tmp.set(y,m,d)
+                    calView.setDate(tmp.timeInMillis)
+
+                }
 
 
+
+                if (dialog.findViewById<CheckBox>(R.id.easyCheckBox).isChecked) {
+                    Log.d(TAG, "YESCHECKED")
+                    if (diffs != null) {
+                        diffs.add("1")
+                    }
+                }
+
+                if (dialog.findViewById<CheckBox>(R.id.mediumCheckBox).isChecked) {
+                    if (diffs != null) {
+                        diffs.add("2")
+                    }
+                }
+
+                if (dialog.findViewById<CheckBox>(R.id.hardCheckBox).isChecked) {
+                    if (diffs != null) {
+                        diffs.add("3")
+                    }
+                }
+
+                if (dialog.findViewById<CheckBox>(R.id.testimonyCheckbox).isChecked) {
+                    if (types != null) {
+                        types.add("Testimony")
+                    }
+                }
+
+                if (dialog.findViewById<CheckBox>(R.id.evidenceCheckBox).isChecked) {
+                    if (types != null) {
+                        types.add("Evidence")
+                    }
+                }
+
+                if (dialog.findViewById<CheckBox>(R.id.otherCheckbox).isChecked) {
+                    if (types != null) {
+                        types.add("Other")
+                    }
+                }
+
+
+                dialog.dismiss()
+                filterMarkers()
+
+
+            }
+
+            dialog.show()
+        }
+
+        val clearBtn : Button = view.findViewById(R.id.clearButton)
+
+        clearBtn.setOnClickListener{
+                clearFilters()
+
+        }
 
 
         return view
@@ -164,22 +299,79 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             }
         })
 
+        googleMap.setOnMarkerClickListener { marker ->
+            // Handle marker click here
+            // You can start a new fragment here
+
+
+            // Return 'true' to indicate that the marker click event is handled
+            true
+        }
+
 
     }
 
     private fun getMarkers() {
 
         Log.d(TAG, "making data")
+        var i = 0
         for (d in markersListData) {
+
             if (d.id !in markerslistIDs) {
-                Log.d(TAG, d.loc!!.latitude.toString())
                 val latlng : LatLng = LatLng(d.loc!!.latitude, d.loc!!.longitude)
-                val markerOptions = MarkerOptions().position(latlng).title(d.type)
-                mMap.addMarker(markerOptions)
+                val markerOptions = MarkerOptions().position(latlng).title(d.id).icon(
+                    icon)
+
+
+
+                val temp = mMap.addMarker(markerOptions)
+                markers.add(temp!!)
+                markerMap[temp] = d
+                i++
                 markerslistIDs.add(d.id!!)
             }
         }
     }
+
+    private fun checkFilter(data: FirebaseManager.Objects) : Boolean {
+        val a = author == null || data.author == author
+        val d = diffs!!.isEmpty() || data.diff.toString() in diffs
+        val t = types!!.isEmpty() || data.type in types
+        val temp : Date = data.date!!.toDate()
+        Log.d(TAG, date.toString())
+        val da = temp.before(date)
+
+
+        return a && d && t && da
+    }
+
+    private fun filterMarkers() {
+        for ((marker, data) in markerMap) {
+            // Determine if the marker should be shown based on the criteria
+            val shouldShowMarker = checkFilter(data)
+
+
+            if (marker != null) {
+                marker.isVisible = shouldShowMarker
+            }
+
+            author == null
+        }
+    }
+
+    private fun clearFilters() {
+        for ((marker, data) in markerMap) {
+
+
+
+            if (marker != null) {
+                marker.isVisible = true
+            }
+
+        }
+    }
+
+
 
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {

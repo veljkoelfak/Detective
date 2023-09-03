@@ -80,7 +80,7 @@ class UserDataViewModel : ViewModel() {
                     val type = doc.getString("type")
                     val desc = doc.getString("desc")
                     val author = doc.getString("author")
-                    val diff = doc.get("diff") as Number
+                    val diff = doc.get("diff") as? Number
                     val date = doc.getTimestamp("date")
                     val photo = doc.getString("photo")
                     val loc = doc.getGeoPoint("location")

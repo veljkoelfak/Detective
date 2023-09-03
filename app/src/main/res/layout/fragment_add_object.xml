@@ -48,7 +48,7 @@
                     android:background="@drawable/rounded_corner"
                     android:layout_gravity="center"
                     android:layout_marginTop="30dp"
-                    android:onClick="onImageViewClicked" />
+                    />
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -56,6 +56,7 @@
                     android:padding="8dp"
                     android:layout_marginTop="30dp"
                     android:background="@drawable/rounded_corner">
+
                     <Spinner
                         style="@style/Widget.AppCompat.DropDownItem.Spinner"
                         android:layout_width="match_parent"
