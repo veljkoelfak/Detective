@@ -47,6 +47,7 @@ class AddObjectFragment : Fragment() {
     private var diffSel: String? = null
 
     private var username: String? = null
+    private var uid:String? = null
 
     private val viewModel: UserDataViewModel by activityViewModels()
 
@@ -112,6 +113,7 @@ class AddObjectFragment : Fragment() {
 
         viewModel.userData.observe(viewLifecycleOwner, Observer { user ->
             username = user.displayName
+            uid = user.uid
         })
 
         val image = view.findViewById<ImageView>(R.id.addPhoto)
@@ -162,13 +164,15 @@ class AddObjectFragment : Fragment() {
             loc = GeoPoint(lat!!, lng!!)
             val date = com.google.firebase.Timestamp(Calendar.getInstance().time)
 
-            viewModel.addObject(typeSel!!,desc, loc!!,username!!,diffSel!!.toInt(), date, uri.toString())
+            viewModel.addObject(typeSel!!,desc, loc!!,username!!,diffSel!!.toInt(), date)
 
             viewModel.addobjectData.observe(viewLifecycleOwner, Observer { success ->
-                if (success == true) {
+
+                    viewModel.earnPoints(uid!!, 20.0)
+                    viewModel.uploadPhoto(success.id, uri)
                     getParentFragmentManager().popBackStack();
 
-                }
+
             })
 
 

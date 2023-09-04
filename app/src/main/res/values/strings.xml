@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Detective</string>
+    <string name="app_name">Get a Clue!</string>
     <string name="title_activity_login_screen">LoginScreen</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>

@@ -21,11 +21,12 @@
 
         <LinearLayout
             android:id="@+id/lh"
-            android:layout_width="208dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:orientation="horizontal"
             android:layout_alignParentBottom="true"  >
+
 
             <Button
                 android:id="@+id/addButton"
@@ -37,10 +38,6 @@
                 android:stateListAnimator="@null"
                 android:textColor="@android:color/white"
                 android:background="@drawable/rounded_corner"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="16dp"
                 android:textSize="16sp" />
 
             <Button
@@ -53,10 +50,6 @@
                 android:stateListAnimator="@null"
                 android:textColor="@android:color/white"
                 android:background="@drawable/rounded_corner"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="16dp"
                 android:textSize="16sp" />
 
             <Button
@@ -65,14 +58,22 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:layout_weight="1"
-                android:text="Filter"
+                android:text="Clear"
                 android:stateListAnimator="@null"
                 android:textColor="@android:color/white"
                 android:background="@drawable/rounded_corner"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:paddingTop="8dp"
-                android:paddingBottom="16dp"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/radiusButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:text="Radius"
+                android:stateListAnimator="@null"
+                android:textColor="@android:color/white"
+                android:background="@drawable/rounded_corner"
                 android:textSize="16sp" />
 
         </LinearLayout>

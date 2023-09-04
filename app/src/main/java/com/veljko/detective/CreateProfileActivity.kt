@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -79,8 +80,9 @@ class CreateProfileActivity : AppCompatActivity() {
 
             if (firstNameText.isNotEmpty() && lastNameText.isNotEmpty() && phoneNumberText.isNotEmpty()) {
                 viewModel.appProfile(user!!,username!!, uri)
-                viewModel.createUser(user.uid,firstNameText, lastNameText, phoneNumberText)
                 viewModel.addPoints(username, user.uid)
+                viewModel.createUser(user.uid,firstNameText, lastNameText, phoneNumberText)
+
             }
         }
 
@@ -88,7 +90,12 @@ class CreateProfileActivity : AppCompatActivity() {
             if (profileSuccess == true) {
 
                 val intent = Intent(this, LoginScreen::class.java)
-                startActivity((intent))
+                viewModel.uploadAvatar(user!!.uid, uri)
+                viewModel.uploadAvatar.observe(this, Observer { task ->
+                    if (task == true) {
+                        startActivity((intent))
+                    }
+                })
             } else {
                 Toast.makeText(getApplicationContext(),"There was an error while registering. Please try later",
                     Toast.LENGTH_SHORT);
@@ -113,7 +120,6 @@ class CreateProfileActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
 
-                Log.d(ContentValues.TAG, "DATAAA")
 
                 val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Avatar.jpg")
 
@@ -122,6 +128,8 @@ class CreateProfileActivity : AppCompatActivity() {
                     this.applicationContext.packageName + ".provider",
                     file
                 )
+
+                Log.d(TAG, uri.toString())
 
                 val imageView = findViewById<ImageView>(R.id.addPhoto)
                 imageView.setImageURI((uri))

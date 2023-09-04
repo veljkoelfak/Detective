@@ -32,6 +32,9 @@ class RegLogViewModel : ViewModel() {
     val pointsLiveData: LiveData<Boolean?>
         get() = _pointsLiveData
 
+    private val _uploadAvatar = MutableLiveData<Boolean>()
+    val uploadAvatar : LiveData<Boolean>
+        get() = _uploadAvatar
 
     private val signedIn = MutableLiveData<Boolean>()
 
@@ -93,5 +96,11 @@ class RegLogViewModel : ViewModel() {
                 _pointsLiveData.value = false
             }
     })}
+
+    fun uploadAvatar(uid:String, file:Uri) {
+        firebaseAuthenticationModel.uploadAvatar(uid, file, OnCompleteListener { task-> _uploadAvatar.value = task.isSuccessful })
+    }
+
+
 
 }

@@ -1,5 +1,8 @@
 package com.veljko.detective.ui
 
+import android.content.Context
+import android.location.Address
+import android.location.Geocoder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +16,7 @@ class CluesAdapter :
     RecyclerView.Adapter<CluesAdapter.ViewHolder>() {
 
         private var data : List<FirebaseManager.Objects>? = null
+        private var context : Context? = null
 
         fun setData(newData: List<FirebaseManager.Objects>) {
             data = newData
@@ -22,28 +26,38 @@ class CluesAdapter :
         class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val nameView: TextView
             val descView: TextView
+            val locView : TextView
 
             init {
-                // Define click listener for the ViewHolder's View
-                nameView = view.findViewById(R.id.nameObjectTextView)
-                descView = view.findViewById(R.id.descTextView)
+                nameView = view.findViewById(R.id.userNameTextView)
+                descView = view.findViewById(R.id.dateTextView)
+                locView = view.findViewById(R.id.commentTextViw)
             }
         }
 
         override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
-            // Create a new view, which defines the UI of the list item
             val view = LayoutInflater.from(viewGroup.context)
                 .inflate(R.layout.clue_item, viewGroup, false)
+
+            context = view.context
+
 
             return ViewHolder(view)
         }
 
         override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
 
-            // Get element from your dataset at this position and replace the
-            // contents of the view with that element
+            val geocoder = Geocoder(context!!)
+            var addressText : MutableList<Address>
+
+            addressText = geocoder.getFromLocation(data!!.get(position).loc!!.latitude, data!!.get(position).loc!!.longitude, 1)!!
+
+
+
             viewHolder.nameView.text = data?.get(position)?.type.toString()
-            viewHolder.descView.text = data?.get(position)?.desc.toString()
+            viewHolder.descView.text = data?.get(position)?.author.toString()
+            viewHolder.locView.text = addressText.get(0).getAddressLine(0) + " " + addressText.get(0).getLocality()
+
 
         }
 

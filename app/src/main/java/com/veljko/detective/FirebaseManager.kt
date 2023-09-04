@@ -8,13 +8,37 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.UploadTask
+import com.google.firebase.storage.ktx.storage
+import java.io.File
+import java.lang.reflect.Field
+import java.sql.Time
+import java.util.*
 
 class FirebaseManager {
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db = Firebase.firestore
+    private val storage = Firebase.storage
+
+    fun uploadPhoto(uid: String, file: Uri, onCompleteListener: OnCompleteListener<UploadTask.TaskSnapshot>) {
+        val ref = storage.reference.child("clues/$uid.jpg")
+        val uploadTask = ref.putFile(file).addOnCompleteListener(onCompleteListener)
+
+    }
+
+    fun signOut() {
+        firebaseAuth.signOut()
+    }
+
+    fun uploadAvatar(uid: String, file: Uri, onCompleteListener: OnCompleteListener<UploadTask.TaskSnapshot>) {
+        val ref = storage.reference.child("avatars/$uid.jpg")
+        val uploadTask = ref.putFile(file).addOnCompleteListener(onCompleteListener)
+
+    }
 
     fun appLogin(email: String, password:String, onCompleteListener: OnCompleteListener<AuthResult>) {
         firebaseAuth.signInWithEmailAndPassword(email, password)
@@ -54,13 +78,12 @@ class FirebaseManager {
         )
 
 
-    fun addObject(type: String, desc: String, loc: GeoPoint, author: String, diff : Number, date: Timestamp, photo: String, onCompleteListener: OnCompleteListener<DocumentReference> ) {
+    fun addObject(type: String, desc: String, loc: GeoPoint, author: String, diff : Number, date: Timestamp, onCompleteListener: OnCompleteListener<DocumentReference> ) {
         var data = hashMapOf<String, Any>("type" to type,
             "desc" to desc,
             "author" to author,
             "date" to date,
             "diff" to diff,
-            "photo" to photo,
             "location" to loc)
         db.collection("clues").add(data).addOnCompleteListener(onCompleteListener)
     }
@@ -70,6 +93,28 @@ class FirebaseManager {
         db.collection("points").document(id).set(data)
     }
 
+    fun earnPoints(uid: String, add: Double, onCompleteListener: OnCompleteListener<DocumentReference> ) {
+        db.collection("points").document(uid).update("points",FieldValue.increment(add))
+    }
+
+    fun addComment(uid: String, username: String, date: Timestamp, comment: String, onCompleteListener: OnCompleteListener<DocumentReference>) {
+
+        var data = hashMapOf<String, Any>("username" to username,
+            "date" to date,
+            "comment" to comment
+        )
+
+        db.collection("comments").document(uid).collection("comms").add(data)
+
+    }
+
+    data class Comment(
+        val id : String? = null,
+        val username : String? = null,
+        val date : Timestamp? = null,
+        val text : String? = null
+    )
+
     data class Objects(
         val id: String? = null,
         val type: String? = null,
@@ -77,8 +122,7 @@ class FirebaseManager {
         val author: String? = null,
         val diff: Number? = null,
         val date: Timestamp? = null,
-        val photo: String? = null,
         val loc: GeoPoint? = null
-    )
+    ) : java.io.Serializable
 
 }

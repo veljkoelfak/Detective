@@ -32,7 +32,6 @@ class LeaderbordAdapter :
     }
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): ViewHolder {
-        // Create a new view, which defines the UI of the list item
         val view = LayoutInflater.from(viewGroup.context)
             .inflate(R.layout.list_item, viewGroup, false)
 
@@ -41,8 +40,7 @@ class LeaderbordAdapter :
 
     override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
 
-        // Get element from your dataset at this position and replace the
-        // contents of the view with that element
+
         viewHolder.pointView.text = data?.get(position)?.points.toString() + " points"
         viewHolder.userView.text = data?.get(position)?.username
         viewHolder.numberView.text = (position+1).toString() + "."

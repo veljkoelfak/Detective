@@ -1,9 +1,14 @@
 package com.veljko.detective
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.GlideBuilder
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.module.AppGlideModule
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
@@ -50,6 +55,7 @@ class MainActivity : AppCompatActivity() {
             super.onBackPressed()
         }
     }
+
 
 
 }

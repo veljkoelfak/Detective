@@ -57,5 +57,8 @@ dependencies {
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation 'com.google.android.gms:play-services-location:19.0.1'
+    implementation("com.google.firebase:firebase-storage-ktx")
+    implementation 'com.firebaseui:firebase-ui-storage:7.2.0'
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
 
 }

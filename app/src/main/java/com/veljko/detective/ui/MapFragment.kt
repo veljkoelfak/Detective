@@ -12,7 +12,6 @@ import android.content.ContentValues.TAG
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.location.Location
 import android.os.Bundle
 import android.os.Looper
@@ -23,6 +22,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CalendarView
 import android.widget.CheckBox
+import android.widget.DatePicker
 import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
@@ -39,38 +39,32 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.firestore.GeoPoint
 import com.veljko.detective.*
-import com.veljko.detective.R
+import com.veljko.detective.ui.ShowClueFragment
 import java.util.*
 import kotlin.collections.HashMap
 
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [MapFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class MapFragment : Fragment(), OnMapReadyCallback {
     // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
 
     private lateinit var mMap: GoogleMap
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
     private var isTrackingLocation = false
     private var isMapReady = false
+
     private lateinit var loc: Location
     private var currentLocationMarker: Marker? = null
+
     private var markersListData = listOf<FirebaseManager.Objects>()
     private var markerslistIDs = mutableListOf<String>()
     private var markers = mutableListOf<Marker>()
 
     private val markerMap = HashMap<Marker, FirebaseManager.Objects>()
+    private val markerIDs = HashMap<String, FirebaseManager.Objects>()
 
     private val viewModel: UserDataViewModel by activityViewModels()
 
@@ -82,15 +76,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var types : MutableList<String> = ArrayList<String>()
     private var diffs : MutableList<String> = ArrayList<String>()
     private var date : Date? = Calendar.getInstance().time
+    private var radius : Number? = 0
+    private var appliedFilter: Boolean = false
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
 
 
 
@@ -115,7 +107,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         val iconBitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_clue_icon)
 
-        val resizedBitmap = Bitmap.createScaledBitmap(iconBitmap, 100, 100, false)
+        val resizedBitmap = Bitmap.createScaledBitmap(iconBitmap, 150, 150, false)
 
         icon = BitmapDescriptorFactory.fromBitmap(resizedBitmap)
 
@@ -181,6 +173,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val filterButton = view.findViewById<Button>(R.id.filterButton)
 
         filterButton.setOnClickListener{
+            Log.d(TAG, "PRESSED")
             var dialog : Dialog = Dialog(requireContext(), R.style.Theme_Detective)
             dialog.setContentView(R.layout.filter_dialog)
 
@@ -210,16 +203,13 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 if (!authorText.text.isEmpty()) {
                     author = authorText.text.toString()
                 }
-                val calendar : CalendarView = dialog.findViewById<CalendarView>(R.id.calendarView)
+                val calendar : DatePicker = dialog.findViewById<DatePicker>(R.id.calendarView)
 
-                calendar.setOnDateChangeListener { calView: CalendarView, y, m, d ->
 
-                    Log.d(TAG, d.toString())
-                    val tmp : Calendar = Calendar.getInstance()
-                    tmp.set(y,m,d)
-                    calView.setDate(tmp.timeInMillis)
+                val tmp = Calendar.getInstance()
+                tmp.set(calendar.year, calendar.month, calendar.dayOfMonth)
+                date = tmp.time
 
-                }
 
 
 
@@ -277,6 +267,34 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         }
 
+        val radBtn : Button = view.findViewById(R.id.radiusButton)
+
+        radBtn.setOnClickListener{
+            radius = 0
+            var dialog : Dialog = Dialog(requireContext(), R.style.Theme_Detective)
+            dialog.setContentView(R.layout.radius_dialog)
+
+            val closeBtn : Button = dialog.findViewById(R.id.closeButton)
+            val editText : EditText = dialog.findViewById(R.id.editText)
+            val applyButton : Button = dialog.findViewById(R.id.FinishButton)
+
+            closeBtn.setOnClickListener{
+                dialog.dismiss()
+            }
+
+            applyButton.setOnClickListener{
+                val tmp = editText.text.toString().toInt() as Number
+                radius = tmp
+                dialog.dismiss()
+                radiusFilter()
+
+            }
+
+            dialog.show()
+        }
+
+
+
 
         return view
     }
@@ -300,11 +318,44 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         })
 
         googleMap.setOnMarkerClickListener { marker ->
-            // Handle marker click here
-            // You can start a new fragment here
 
 
-            // Return 'true' to indicate that the marker click event is handled
+            val dist: FloatArray = FloatArray(2)
+
+            Location.distanceBetween(
+                marker.position.latitude,
+                marker.position.longitude,
+                loc.latitude,
+                loc.longitude,
+                dist
+            )
+
+            if (!marker.title.equals("User")) {
+
+
+
+                Log.d(TAG, "TOUCHED")
+
+                val tmp: FirebaseManager.Objects = markerIDs[marker.title]!!
+
+                val fm: FragmentManager = childFragmentManager
+                val transaction = fm.beginTransaction()
+
+                val bundle: Bundle = Bundle()
+                bundle.putSerializable("data", tmp)
+
+                if (dist[0] <= 50) {
+                    bundle.putDouble("extra", 3.00)
+                }
+
+                val showClueFragment = ShowClueFragment()
+                showClueFragment.arguments = bundle
+
+                transaction.replace(R.id.`object`, showClueFragment)
+                transaction.addToBackStack("addClue")
+                transaction.commit()
+            }
+
             true
         }
 
@@ -320,13 +371,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             if (d.id !in markerslistIDs) {
                 val latlng : LatLng = LatLng(d.loc!!.latitude, d.loc!!.longitude)
                 val markerOptions = MarkerOptions().position(latlng).title(d.id).icon(
-                    icon)
-
-
+                    icon).title(d.id)
 
                 val temp = mMap.addMarker(markerOptions)
-                markers.add(temp!!)
-                markerMap[temp] = d
+                markerMap[temp!!] = d
+                markerIDs[d.id!!] = d
                 i++
                 markerslistIDs.add(d.id!!)
             }
@@ -346,6 +395,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     private fun filterMarkers() {
+        appliedFilter = true
         for ((marker, data) in markerMap) {
             // Determine if the marker should be shown based on the criteria
             val shouldShowMarker = checkFilter(data)
@@ -355,13 +405,48 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 marker.isVisible = shouldShowMarker
             }
 
-            author == null
+        }
+    }
+
+    private fun checkRadius(data: FirebaseManager.Objects): Boolean {
+
+        val dist: FloatArray = FloatArray(2)
+
+        Location.distanceBetween(
+            data.loc!!.latitude,
+            data.loc!!.longitude,
+            loc.latitude,
+            loc.longitude,
+            dist
+        )
+
+
+        val r = radius as Int
+
+
+        return (r >= dist[0])
+    }
+
+    private fun radiusFilter() {
+        for((marker, data) in markerMap) {
+            val shouldShowMarker = checkRadius(data)
+
+            if (marker != null) {
+                if (appliedFilter == true) {
+                    if (marker.isVisible == true) {
+                        marker.isVisible = shouldShowMarker
+                    }
+                }
+                else {
+                    marker.isVisible = shouldShowMarker
+                }
+            }
         }
     }
 
     private fun clearFilters() {
+        appliedFilter = false
         for ((marker, data) in markerMap) {
-
 
 
             if (marker != null) {
@@ -413,7 +498,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val latLng = LatLng(location.latitude, location.longitude)
         currentLocationMarker?.remove()
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
-        currentLocationMarker  = mMap.addMarker(MarkerOptions().position(latLng).title("My Location"))
+        currentLocationMarker  = mMap.addMarker(MarkerOptions().position(latLng).title("User"))
     }
 
     override fun onResume() {

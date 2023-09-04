@@ -14,7 +14,6 @@
         android:layout_height="wrap_content"
         android:padding="8dp">
 
-
         <TextView
             android:id="@+id/userNameTextView"
             android:layout_width="0dp"
@@ -50,9 +49,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/userNameTextView" />
-
-
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
